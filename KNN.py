@@ -1,4 +1,10 @@
 import heapq
+import math
+import torch
+
+def euclidean_distance(feature1,feature2):
+    return torch.sqrt(torch.sum(torch.pow((feature1+feature2),2)))
+
 
 class KNN:
     def __init__(self,k):
