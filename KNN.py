@@ -1,7 +1,7 @@
 import heapq
 import math
 import torch
-
+import pickle
 
 # =====================距离求解======================
 # L2 范数
@@ -16,7 +16,6 @@ def manhattan_distance(feature1, feature2):
 
 # L 无穷范数
 def chebyshev_distance(feature1, feature2):
-    # TODO fix
     return torch.max(torch.abs(feature1 - feature2))
 
 
@@ -25,10 +24,20 @@ def chebyshev_distance(feature1, feature2):
 
 
 # ====================预处理函数=======================
-# 归一化数据最大最小值归一化
-def normalize(vector: torch.tensor):
-    return torch.nn.functional.normalize(vector,p=torch.inf,dim=0)
 
+def train_model(features, lables, k):
+    model = KNN(k)
+    model.Train(features,lables)
+    return model
+
+def save_model(model):
+    with open('data/model.pickle', 'wb') as f:
+        pickle.dump(model,f)
+
+def load_model(filename):
+    with open(filename,"rb") as f:
+        model = pickle.load(f)
+    return model
 
 class KNN:
     def __init__(self, k):
