@@ -1,10 +1,20 @@
 import KNN
 import torch
 
-if __name__ == '__main__':
-    feature1 = torch.tensor([3,4])
-    feature2 = torch.tensor([0,0])
-    print(KNN.euclidean_distance(feature1,feature2))
+import valid
 
-    vector = torch.tensor([[3,4,10,10],[10,10,100,100]],dtype=torch.float32) # 注意torch保持原有变量类型
-    print(KNN.normalize(vector))
+if __name__ == '__main__':
+    features = torch.load("data/train/vectors.pt") # 存储batch
+    labels = torch.load("data/train/labels.pt")
+
+    model = KNN.train_model(features, labels, 3)
+    model.DefineKF(kernal_function=KNN.euclidean_distance)
+
+    test_x = torch.load("data/test/vector.pt")
+    test_y = torch.load("data/test/label.pt")
+
+    valid.validator(test_x, test_y, model)
+
+
+
+
