@@ -5,6 +5,9 @@ import pickle
 
 # =====================距离求解======================
 # L2 范数
+import visualization
+
+
 def euclidean_distance(feature1, feature2):
     return torch.sqrt(torch.sum(torch.pow((feature1 + feature2), 2)))
 
@@ -46,8 +49,8 @@ def load_model(filename):
     return model
 
 # 将特征向量转换为矩阵
-def vector2matrix(feature:torch.tensor):
-    return feature.reshape(1,-1)
+# def vector2matrix(feature:torch.tensor):
+#     return feature.reshape(1,-1)
 
 class KNN:
     def __init__(self, k):
@@ -76,7 +79,9 @@ class KNN:
     def TrainLinearMapping(self, features:torch.tensor, labels:torch.tensor, epochs =10, learn_rate = 0.01,r = 0.5):
         self.features = features
         self.labels = labels
-        L = vector2matrix(torch.rand(features.shape[1]))
+        loss_x = torch.tensor([i for i in range(1,epochs+1)])
+        loss_y = torch.tensor([])
+        L = torch.rand(features.shape[1])
         for epoch in range(epochs):
             loss = 0
             gridient = 0
@@ -102,10 +107,12 @@ class KNN:
                         loss += push_loss
 
             print(f"training linear mapping parameter epoch:{epoch} / {epochs} loss={loss} learning rate={learn_rate}")
+            loss_y.append(loss)
             L = L - gridient*learn_rate
             learn_rate *= 0.95 ** (epoch + 1)
         print(f"Linear Mapping {L}")
         self.L = L
+        visualization.ScatterChart(loss_x,loss_y)
 
 
     def DetectLinearMapping(self,feature):
