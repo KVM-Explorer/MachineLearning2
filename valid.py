@@ -27,7 +27,7 @@ def Recall(matrix):
 
 
 
-def validator(test_x, test_y, model):
+def validator(test_x, test_y, model,type="single"):
 
     # 混淆矩阵
     confusion_matrix = [[0,0,0],
@@ -36,7 +36,10 @@ def validator(test_x, test_y, model):
     for i in range(0,len(test_x)):
         feature = test_x[i]
         label = test_y[i] # 0 1 2
-        ret = model.Detect(feature)
+        if type=="single" :
+            ret = model.Detect(feature)
+        else:
+            ret = model.DetectLinearMapping(feature)
         confusion_matrix[label][ret] = confusion_matrix[label][ret] + 1
 
     Accuracy(confusion_matrix)

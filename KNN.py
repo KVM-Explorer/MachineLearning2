@@ -20,19 +20,24 @@ def chebyshev_distance(feature1, feature2):
 
 def bhattacharyya_distance(feature1,feature2):
     return -math.ln(torch.sum(torch.sqrt(torch.dot(feature1,feature2))))        # 可能存在负数，但如果按照距离比较的画不影响
-# ==================== 核函数=========================
 
+# ==================== 核函数=========================
+def single_mapping(feature):
+    return feature
 
 
 # ====================预处理函数=======================
 
-def train_model(features, lables, k):
+def train_model(features, lables, k,type = "single"):
     model = KNN(k)
-    model.Train(features,lables)
+    if type == "single" :
+        model.Train(features,lables)
+    else:
+        model.TrainLinearMapping(features,lables)
     return model
 
-def save_model(model):
-    with open('data/model.pickle', 'wb') as f:
+def save_model(model,filename):
+    with open(f'model/{filename}.pickle', 'wb') as f:
         pickle.dump(model,f)
 
 def load_model(filename):
@@ -50,7 +55,7 @@ class KNN:
         self.df = None
         self.features = None
         self.labels = None
-        self.S = None
+        self.L = None
         self.k = k
 
     class Item:
@@ -100,17 +105,14 @@ class KNN:
             L = L - gridient*learn_rate
             learn_rate *= 0.95 ** (epoch + 1)
         print(f"Linear Mapping {L}")
-        self.S = L*L
+        self.L = L
 
 
     def DetectLinearMapping(self,feature):
-
-
-    def Detect(self, feature):
         dis_list = []
-        feature_kf = self.kf(feature)
+        feature_kf = self.kf(feature)*self.L
         for i in range(0, len(self.features)):
-            dis = self.df(self.kf(self.features[i]), feature)  # Todo 计算核函数
+            dis = self.df(self.kf(self.features[i])*self.L, feature_kf)
             heapq.heappush(dis_list, self.Item(dis, self.labels[i]))  # 默认小根堆
 
         label_count = {0: 0, 1: 0, 2: 0}
@@ -121,8 +123,34 @@ class KNN:
             if label_count[tmp.label] > label_count[label]:
                 label = tmp.label
 
-        self.features.add(feature)
-        self.labels.add(label)
+        # Todo 关闭学习
+        # self.features.add(feature)
+        # self.labels.add(label)
+        return label
+
+
+    def Detect(self, feature):
+        dis_list = []
+        feature_kf = self.kf(feature)
+        for i in range(0, len(self.features)):
+            dis = self.df(self.kf(self.features[i]), feature_kf)
+            heapq.heappush(dis_list, self.Item(dis, self.labels[i]))  # 默认小根堆
+
+        label_count = {0: 0, 1: 0, 2: 0}
+        label = 0
+        for i in range(0, self.k):
+            tmp = heapq.heappop(dis_list)
+            label_count[tmp.label] += 1
+            if label_count[tmp.label] > label_count[label]:
+                label = tmp.label
+
+        # Todo 关闭学习
+        # self.features.add(feature)
+        # self.labels.add(label)
+        return label
 
     def DefineKF(self, kernal_function):
-        self.kf = kernal_function;
+        self.kf = kernal_function
+
+    def DefineDF(self,distance_function):
+        self.df = distance_function
