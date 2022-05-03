@@ -1,11 +1,11 @@
 import KNN
 def Accuracy(matrix):
     print("===============================")
-    right = matrix[0][0]+matrix[1][0]+matrix[2][0]
+    right = matrix[0][0]+matrix[1][1]+matrix[2][2]
     tot = 0
     for i in range(3):
         tot = tot + sum(matrix[i])
-    right_rate = right/tot *100.0
+    right_rate = right/tot * 100.0
     print(f"全部样本准确率为{right_rate}%")
 
 # 真正预测正确占所有预测为当前标签的比率
@@ -13,10 +13,13 @@ def Precision(matrix):
     print("===============================")
     for i in range(3):
         tot = matrix[0][i]+matrix[1][i]+matrix[2][i]
-        right_rate = matrix[i][i] / tot *100.0
-        print(f"类别{i}的精确率为{right_rate}%")
+        if tot != 0 :
+            right_rate = matrix[i][i] / tot *100.0
+            print(f"类别{i}的精确率为{right_rate}%")
+        else :
+            print(f"类别{i}的精确率为0%")
 
-#
+
 def Recall(matrix):
     print("===============================")
     for i in range(3):
@@ -45,3 +48,5 @@ def validator(test_x, test_y, model,type="single"):
     Accuracy(confusion_matrix)
     Precision(confusion_matrix)
     Recall(confusion_matrix)
+
+    print(confusion_matrix)

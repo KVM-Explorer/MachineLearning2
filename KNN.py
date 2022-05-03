@@ -66,23 +66,23 @@ class KNN:
             self.dis = dis;
             self.label = label;
 
-        def __iter__(self, other):
+        def __lt__(self, other):
             if self.dis < other.dis:
                 return True
             else:
-                return False;
+                return False
 
     def Train(self, features, labels):
         self.features = features
         self.labels = labels
 
-    def TrainLinearMapping(self, features:torch.tensor, labels:torch.tensor, epochs =10, learn_rate = 0.01,r = 0.5):
+    def TrainLinearMapping(self, features:torch.tensor, labels:torch.tensor, epochs =10, learn_rate = 1e-6,r = 0.5):
         self.features = features
         self.labels = labels
-        loss_x = torch.tensor([i for i in range(1,epochs+1)])
-        loss_y = torch.tensor([])
+        loss_x = [i for i in range(1,epochs+1)]
+        loss_y = []
         L = torch.rand(features.shape[1])
-        for epoch in range(epochs):
+        for epoch in range(1,epochs+1):
             loss = 0
             gridient = 0
             for i in range(len(features)):
@@ -90,8 +90,8 @@ class KNN:
                     if i==j or labels[i]!=labels[j] : continue
                     # pull
                     x_ij = features[i] - features[j]
-                    pull_loss = float(sum(x_ij*x_ij*L*L))
-                    pull_gridient = (1-r)*L*L*x_ij
+                    pull_loss = float(sum(x_ij*x_ij*L))
+                    pull_gridient = (1-r)*L*x_ij*x_ij
 
                     gridient += pull_gridient
                     loss += pull_loss
@@ -99,20 +99,20 @@ class KNN:
                     for p in range(len(features)):
                         if p==i or p==j or labels[p]==labels[i]: continue
                         x_ip = features[i]-features[p]
-                        push_loss = 1+pull_loss-float(sum(L*L*x_ip*x_ip))
+                        push_loss = 1+pull_loss-float(sum(L*x_ip*x_ip))
                         if push_loss < 0: continue
-                        push_gridient = r*(1+pull_gridient-L*L*x_ip)
+                        push_gridient = r*(1+pull_gridient-L*x_ip*x_ip)
 
                         gridient += push_gridient
                         loss += push_loss
 
             print(f"training linear mapping parameter epoch:{epoch} / {epochs} loss={loss} learning rate={learn_rate}")
             loss_y.append(loss)
-            L = L - gridient*learn_rate
+            L = L + gridient*learn_rate     #?????为什么反而采取加法
             learn_rate *= 0.95 ** (epoch + 1)
         print(f"Linear Mapping {L}")
         self.L = L
-        visualization.ScatterChart(loss_x,loss_y)
+        visualization.ScatterChart(torch.tensor(loss_x),torch.tensor(loss_y))
 
 
     def DetectLinearMapping(self,feature):
@@ -126,9 +126,9 @@ class KNN:
         label = 0
         for i in range(0, self.k):
             tmp = heapq.heappop(dis_list)
-            label_count[tmp.label] += 1
-            if label_count[tmp.label] > label_count[label]:
-                label = tmp.label
+            label_count[int(tmp.label)] += 1
+            if label_count[int(tmp.label)] > label_count[label]:
+                label = int(tmp.label)
 
         # Todo 关闭学习
         # self.features.add(feature)
@@ -147,9 +147,9 @@ class KNN:
         label = 0
         for i in range(0, self.k):
             tmp = heapq.heappop(dis_list)
-            label_count[tmp.label] += 1
-            if label_count[tmp.label] > label_count[label]:
-                label = tmp.label
+            label_count[int(tmp.label)] += 1
+            if label_count[int(tmp.label)] > label_count[label]:
+                label = int(tmp.label)
 
         # Todo 关闭学习
         # self.features.add(feature)
