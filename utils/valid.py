@@ -5,7 +5,7 @@ def Accuracy(matrix):
     for i in range(3):
         tot = tot + sum(matrix[i])
     right_rate = right/tot * 100.0
-    print(f"全部样本准确率为{right_rate}%")
+    print(f"全部样本准确率为{right_rate:.2f}%")
     return right_rate
 
 # 真正预测正确占所有预测为当前标签的比率
@@ -15,7 +15,7 @@ def Precision(matrix):
         tot = matrix[0][i]+matrix[1][i]+matrix[2][i]
         if tot != 0 :
             right_rate = matrix[i][i] / tot *100.0
-            print(f"类别{i}的精确率为{right_rate}%")
+            print(f"类别{i}的精确率为{right_rate:.2f}%")
         else :
             print(f"无预测为{i}类别的结果")
 
@@ -26,7 +26,7 @@ def Recall(matrix):
         tot = sum(matrix[i])
         if tot != 0:
             right_rate = matrix[i][i] / tot *100.0
-            print(f"类别{i}的召回率为{right_rate}%")
+            print(f"类别{i}的召回率为{right_rate:.2f}%")
         else:
             print(f"无预测为{i}类别的结果")
 
