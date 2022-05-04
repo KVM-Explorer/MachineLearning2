@@ -2,15 +2,12 @@ import heapq
 import math
 import torch
 import pickle
-
+from utils import visualization
 # =====================距离求解======================
+
 # L2 范数
-import visualization
-
-
 def euclidean_distance(feature1, feature2):
-    return torch.sqrt(torch.sum(torch.pow((feature1 + feature2), 2)))
-
+    return torch.sqrt(torch.sum(torch.pow((feature1 - feature2), 2)))
 
 # L1 范数
 def manhattan_distance(feature1, feature2):
@@ -84,35 +81,35 @@ class KNN:
         L = torch.rand(features.shape[1])
         for epoch in range(1,epochs+1):
             loss = 0
-            gridient = 0
+            gradient = 0
             for i in range(len(features)):
                 for j in range(len(features)):
                     if i==j or labels[i]!=labels[j] : continue
                     # pull
                     x_ij = features[i] - features[j]
-                    pull_loss = float(sum(x_ij*x_ij*L))
-                    pull_gridient = (1-r)*L*x_ij*x_ij
+                    pull_loss = float(sum(x_ij*x_ij*L*L))
+                    pull_gradient = (1-r)*L*x_ij*x_ij
 
-                    gridient += pull_gridient
+                    gradient += pull_gradient
                     loss += pull_loss
                     # push
                     for p in range(len(features)):
                         if p==i or p==j or labels[p]==labels[i]: continue
                         x_ip = features[i]-features[p]
-                        push_loss = 1+pull_loss-float(sum(L*x_ip*x_ip))
+                        push_loss = 1+pull_loss-float(sum(L*L*x_ip*x_ip))
                         if push_loss < 0: continue
-                        push_gridient = r*(1+pull_gridient-L*x_ip*x_ip)
+                        push_gradient = r*(1+pull_gradient-L*x_ip*x_ip)
 
-                        gridient += push_gridient
+                        gradient += push_gradient
                         loss += push_loss
 
             print(f"training linear mapping parameter epoch:{epoch} / {epochs} loss={loss} learning rate={learn_rate}")
             loss_y.append(loss)
-            L = L + gridient*learn_rate     #?????为什么反而采取加法
+            L = L - gradient*learn_rate     #Todo ?????为什么反而采取加法
             learn_rate *= 0.95 ** (epoch + 1)
         print(f"Linear Mapping {L}")
         self.L = L
-        visualization.ScatterChart(torch.tensor(loss_x),torch.tensor(loss_y))
+        visualization.ScatterChart(torch.tensor(loss_x), torch.tensor(loss_y))
 
 
     def DetectLinearMapping(self,feature):
