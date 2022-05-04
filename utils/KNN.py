@@ -19,7 +19,7 @@ def chebyshev_distance(feature1, feature2):
     return torch.max(torch.abs(feature1 - feature2))
 
 def bhattacharyya_distance(feature1,feature2):
-    return -math.ln(torch.sum(torch.sqrt(torch.dot(feature1,feature2))))        # 可能存在负数，但如果按照距离比较的画不影响
+    return -math.log1p(torch.sum(torch.sqrt(torch.dot(feature1,feature2))))        # 可能存在负数，但如果按照距离比较的画不影响
 
 # ==================== 核函数=========================
 def single_mapping(feature):
@@ -28,12 +28,14 @@ def single_mapping(feature):
 
 # ====================预处理函数=======================
 
-def train_model(features, lables, k,type = "single"):
+def train_model(features, lables, k, train_type ="single"):
     model = KNN(k)
-    if type == "single" :
+    if train_type == "single" :
         model.Train(features,lables)
     else:
-        model.TrainLinearMapping(features,lables)
+        model.TrainLinearMapping(features,lables,
+                                 learn_rate=1e-6,
+                                 r=0.2 )
     return model
 
 def save_model(model,filename):
@@ -57,6 +59,7 @@ class KNN:
         self.labels = None
         self.L = None
         self.k = k
+        self.one_class = None
 
     class Item:
         def __init__(self, dis, label):
@@ -103,13 +106,13 @@ class KNN:
                         gradient += push_gradient
                         loss += push_loss
 
-            print(f"training linear mapping parameter epoch:{epoch} / {epochs} loss={loss} learning rate={learn_rate}")
+            print(f"training linear mapping parameter epoch:{epoch} / {epochs} loss={loss:.2f} learning rate={learn_rate}")
             loss_y.append(loss)
-            L = L - gradient*learn_rate     #Todo ?????为什么反而采取加法
+            L = L + gradient*learn_rate
             learn_rate *= 0.95 ** (epoch + 1)
         print(f"Linear Mapping {L}")
         self.L = L
-        visualization.ScatterChart(torch.tensor(loss_x), torch.tensor(loss_y))
+        visualization.LineChart(torch.tensor(loss_x), torch.tensor(loss_y))
 
 
     def DetectLinearMapping(self,feature):
@@ -117,6 +120,7 @@ class KNN:
         feature_kf = self.kf(feature)*self.L
         for i in range(0, len(self.features)):
             dis = self.df(self.kf(self.features[i])*self.L, feature_kf)
+            if self.one_class != None and dis > self.one_class : return 3
             heapq.heappush(dis_list, self.Item(dis, self.labels[i]))  # 默认小根堆
 
         label_count = {0: 0, 1: 0, 2: 0}
@@ -158,3 +162,6 @@ class KNN:
 
     def DefineDF(self,distance_function):
         self.df = distance_function
+
+    def OneClass(self,u):
+        self.one_class = u
