@@ -57,7 +57,32 @@ def k_cross_validation(features, labels, block_size=3):
             best_k.append(i + 1)
     return best_k
 
+# 定义同类样本的密度
+def class_density(features):
+    density = 0
+    num = len(features)
+    for i in range(len(features)):
+        for j in range(i+1,len(features)):
+            density += KNN.euclidean_distance(features[i],features[j])
+    density = density / ((num*(num-1))/2)
+    return 1/density
+def sample_density(features,labels):
+    class0_features = []
+    class1_features = []
+    class2_features = []
 
-def sample_density():
-    # Todo
-    return
+    for i in range(len(features)):
+        if labels[i] == 0:
+            class0_features.append(features[i])
+        elif labels[i] == 1:
+            class1_features.append(features[i])
+        else:
+            class2_features.append(features[i])
+
+
+    class0_density = class_density(class0_features)
+    class1_density = class_density(class1_features)
+    class2_density = class_density(class2_features)
+    print(f"class 0 density:{class0_density}")
+    print(f"class 1 density:{class1_density}")
+    print(f"class 2 density:{class2_density}")

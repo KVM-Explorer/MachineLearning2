@@ -7,5 +7,6 @@ if __name__ == "__main__":
     labels = torch.load("data/train/labels.pt")
 
     # 交叉验证最佳K值
-    best_k = optimization.k_cross_validation(features=features,labels=labels,block_size=9)
-    print(best_k)
+    #best_k = optimization.k_cross_validation(features=features,labels=labels,block_size=12)
+    #print(best_k)
+    optimization.sample_density(features, labels)
