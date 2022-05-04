@@ -4,13 +4,22 @@ import torch.nn.functional as F
 from torch.autograd import Variable
 import matplotlib.pyplot as plt
 
-def ScatterChart(feature1:torch.tensor,feature2:torch.tensor):
+def ScatterChart(feature1:torch.tensor,feature2:torch.tensor,
+                 x_range:list = None,y_range:list = None,
+                 x_label:str = "",y_label: str = "",
+                 title:str = None):
 
     x,y=Variable(feature1),Variable(feature2)
-    plt.xlabel("x: zuobiao")
-    plt.ylabel("y: zuobiao")
-    plt.xlim([-15,30])
-    plt.ylim([-15,30])
+
+    plt.xlabel(f"{x_label}")
+    plt.ylabel(f"{y_label}")
+    if title is not None:
+        plt.title(title)
+    if x_range is not None:
+        plt.xlim(x_range)
+    if y_range is not None:
+        plt.ylim(y_range)
+
     plt.scatter(x.data.numpy(),y.data.numpy())
     plt.figure()
     plt.show()

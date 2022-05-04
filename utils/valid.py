@@ -6,6 +6,7 @@ def Accuracy(matrix):
         tot = tot + sum(matrix[i])
     right_rate = right/tot * 100.0
     print(f"全部样本准确率为{right_rate}%")
+    return right_rate
 
 # 真正预测正确占所有预测为当前标签的比率
 def Precision(matrix):
@@ -16,15 +17,18 @@ def Precision(matrix):
             right_rate = matrix[i][i] / tot *100.0
             print(f"类别{i}的精确率为{right_rate}%")
         else :
-            print(f"类别{i}的精确率为0%")
+            print(f"无预测为{i}类别的结果")
 
 
 def Recall(matrix):
     print("===============================")
     for i in range(3):
         tot = sum(matrix[i])
-        right_rate = matrix[i][i] / tot *100.0
-        print(f"类别{i}的召回率为{right_rate}%")
+        if tot != 0:
+            right_rate = matrix[i][i] / tot *100.0
+            print(f"类别{i}的召回率为{right_rate}%")
+        else:
+            print(f"无预测为{i}类别的结果")
 
 
 
@@ -44,8 +48,9 @@ def validator(test_x, test_y, model,type="single"):
             ret = model.DetectLinearMapping(feature)
         confusion_matrix[label][ret] = confusion_matrix[label][ret] + 1
 
-    Accuracy(confusion_matrix)
+    accuracy = Accuracy(confusion_matrix)
     Precision(confusion_matrix)
     Recall(confusion_matrix)
 
     print(confusion_matrix)
+    return accuracy
