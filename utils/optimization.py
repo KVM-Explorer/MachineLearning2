@@ -86,3 +86,12 @@ def sample_density(features,labels):
     print(f"class 0 density:{class0_density}")
     print(f"class 1 density:{class1_density}")
     print(f"class 2 density:{class2_density}")
+
+def one_class_range(features):
+    max_dis = 0
+    for i in range(len(features)):
+        for j in range(i+1,len(features)):
+            dis = KNN.euclidean_distance(features[i],features[j])
+            max_dis = max(max_dis,dis)
+    print(f"one class range:{max_dis}")
+    return max_dis

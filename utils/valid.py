@@ -46,8 +46,10 @@ def validator(test_x, test_y, model,type="single"):
             ret = model.Detect(feature)
         else:
             ret = model.DetectLinearMapping(feature)
-        confusion_matrix[label][ret] = confusion_matrix[label][ret] + 1
-
+        if ret!=4:
+            confusion_matrix[label][ret] = confusion_matrix[label][ret] + 1
+        else:
+            print("appear other class")
     accuracy = Accuracy(confusion_matrix)
     Precision(confusion_matrix)
     Recall(confusion_matrix)
