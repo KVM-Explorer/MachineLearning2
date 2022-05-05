@@ -1,20 +1,11 @@
 import datetime
-from cmath import rect
-
-import numpy as np
 import numpy
 import torch
-import cv2
-import tkinter
-import numpy as np
-from matplotlib import pyplot as plt
 starttime = datetime.datetime.now()
-from matplotlib import pyplot as plt
 
 print("开始执行")
 import numpy as np
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import confusion_matrix, classification_report
 
 import os
 import cv2
@@ -257,13 +248,13 @@ if __name__=="__main__":
     numpy.array(X_train)
     numpy.array(X_test)
     feature1 = torch.tensor(X_train)
-    torch.save(feature1, "../data/train/vectors.pt")
+    torch.save(feature1, "data/train/vectors.pt")
 
     feature2 = torch.tensor(y_train)
-    torch.save(feature2, "../data/train/labels.pt")
+    torch.save(feature2, "data/train/labels.pt")
 
     feature3 = torch.tensor(X_test)
-    torch.save(feature3, "../data/test/vectors.pt")
+    torch.save(feature3, "data/test/vectors.pt")
 
     feature4 = torch.tensor(y_test)
     torch.save(feature4, "data/test/labels")
