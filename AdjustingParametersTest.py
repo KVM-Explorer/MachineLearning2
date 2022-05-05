@@ -14,4 +14,5 @@ if __name__ == "__main__":
     # optimization.sample_density(features, labels)
 
     # one class 识别
-    # optimization.one_class_range(features=features)
+    D = optimization.one_class_range(features=features)
+    print(D)
